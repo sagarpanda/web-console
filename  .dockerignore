@@ -1,0 +1,6 @@
+/server/node_modules
+npm-debug.log
+build
+.git
+*.md
+.gitignore

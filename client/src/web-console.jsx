@@ -1,4 +1,5 @@
 import { Terminal as XTerminal } from '@xterm/xterm';
+import { FitAddon } from '@xterm/addon-fit';
 import { useEffect, useRef } from 'react';
 import socket from './socket';
 
@@ -12,11 +13,12 @@ const WebConsole = () => {
     if (isRendered.current) return;
     isRendered.current = true;
 
-    const term = new XTerminal({
-      rows: 20
-    });
+    const term = new XTerminal();
+    const fitAddon = new FitAddon();
+    term.loadAddon(fitAddon);
 
     term.open(terminalRef.current);
+    fitAddon.fit();
 
     term.onData((data) => {
       socket.emit('terminal:write', data);
@@ -27,9 +29,13 @@ const WebConsole = () => {
     }
 
     socket.on('terminal:data', onTerminalData);
+
+    new ResizeObserver(() => term.loadAddon(fitAddon)).observe(
+      terminalRef.current
+    );
   }, []);
 
-  return <div ref={terminalRef} id="terminal" />;
+  return <div ref={terminalRef} id="terminal" style={{ height: '100vh' }} />;
 };
 
 export default WebConsole;
